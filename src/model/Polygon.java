@@ -29,4 +29,42 @@ public class Polygon {
     public void clear(){
         points.clear();
     }
+
+    public void remove(int index){
+        points.remove(index);
+    }
+
+    public int nearestPoint(Point2D point, int range){
+
+        if (points.isEmpty())
+            return -1;
+
+        double minDistance = Double.MAX_VALUE;
+        int minDistancePointIndex = 0;
+        for (int i = 0; i < points.size(); i++) {
+
+            Point2D polygonPoint = points.get(i);
+            double distance = pythagoras(polygonPoint.getX() - point.getX(),polygonPoint.getY() - point.getY());
+
+            if (distance < minDistance)
+            {
+                minDistance = distance;
+                minDistancePointIndex = i;
+            }
+        }
+
+        if (minDistance <= range)
+        {
+            return minDistancePointIndex;
+        }
+        else {
+            return -1;
+        }
+
+
+    }
+
+    private double pythagoras(int a, int b){
+        return Math.sqrt(a*a + b*b);
+    }
 }
