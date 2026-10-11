@@ -2,9 +2,9 @@ package raster;
 
 import model.Point2D;
 
-import java.awt.*;
 import java.awt.image.BufferedImage;
 
+/** Raster nad BufferedImage, který Panel vykresluje na obrazovku. */
 public class RasterBufferedImage implements Raster {
 
     private final BufferedImage image;
@@ -15,10 +15,10 @@ public class RasterBufferedImage implements Raster {
 
     @Override
     public void setPixel(int x, int y, int color) {
+        // pixely mimo plátno se přeskočí, setRGB by na nich vyhodil výjimku
         if (x >= 0 && x < this.getWidth() && y >= 0 && y < this.getHeight()) {
             image.setRGB(x, y, color);
         }
-
     }
 
     @Override
@@ -42,11 +42,6 @@ public class RasterBufferedImage implements Raster {
 
     @Override
     public void clear() {
-        image.getGraphics().clearRect(
-                0,
-                0,
-                image.getWidth(),
-                image.getHeight()
-        );
+        image.getGraphics().clearRect(0, 0, image.getWidth(), image.getHeight());
     }
 }

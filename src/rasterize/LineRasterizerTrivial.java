@@ -1,13 +1,12 @@
 package rasterize;
 
 import Context.Color;
-import model.Line;
-import model.Point2D;
 import raster.Raster;
 
+/** Triviální algoritmus úsečky z rovnice přímky y = k·x + q. */
 public class LineRasterizerTrivial extends LineRasterizer {
 
-    int color = Color.COLOR;
+    private final int color = Color.COLOR;
 
     public LineRasterizerTrivial(Raster raster) {
         super(raster);
@@ -15,12 +14,13 @@ public class LineRasterizerTrivial extends LineRasterizer {
 
     @Override
     public void rasterize(int x1, int y1, int x2, int y2) {
+        // svislá úsečka – k by bylo dělení nulou
         if (x1 == x2) {
             if (y1 > y2) {
                 int t = y1; y1 = y2; y2 = t;
             }
             for (int y = y1; y <= y2; y++) {
-                raster.setPixel(x1, y,color);
+                raster.setPixel(x1, y, color);
             }
             return;
         }
@@ -36,7 +36,7 @@ public class LineRasterizerTrivial extends LineRasterizer {
             }
             for (int x = x1; x <= x2; x++) {
                 int y = (int) Math.round(k * x + q);
-                raster.setPixel(x, y,color);
+                raster.setPixel(x, y, color);
             }
         } else {
             // strmá úsečka, řídicí osa y
@@ -45,7 +45,7 @@ public class LineRasterizerTrivial extends LineRasterizer {
             }
             for (int y = y1; y <= y2; y++) {
                 int x = (int) Math.round((y - q) / k);
-                raster.setPixel(x, y,color);
+                raster.setPixel(x, y, color);
             }
         }
     }

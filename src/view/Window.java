@@ -1,8 +1,8 @@
 package view;
 
 import javax.swing.*;
-import java.awt.*;
 
+/** Hlavní okno aplikace s jedním kreslicím panelem. */
 public class Window extends JFrame {
 
     private final Panel panel;

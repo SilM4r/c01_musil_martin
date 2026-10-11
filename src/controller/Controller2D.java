@@ -17,6 +17,12 @@ import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Ovládání:
+ *  levé tlačítko  – kreslí úsečku / přidává vrchol polygonu (podle režimu M)
+ *  pravé tlačítko – přesouvá / maže nejbližší vrchol (podle nástroje N)
+ *  C – smaže scénu, M – přepne úsečka/polygon, N – přepne přesun/mazání
+ */
 public class Controller2D {
     private static final int GRAB_RANGE = 10;
 
@@ -32,7 +38,6 @@ public class Controller2D {
 
     // vrchol chycený pravým tlačítkem, -1 = žádný
     private int draggedPointIndex = -1;
-
 
     public Controller2D(Panel panel) {
         this.panel = panel;
@@ -69,6 +74,7 @@ public class Controller2D {
 
                 drawScene();
             }
+
             @Override
             public void mouseReleased(MouseEvent e) {
                 if (e.getButton() == MouseEvent.BUTTON3) {
@@ -104,22 +110,18 @@ public class Controller2D {
         panel.addKeyListener(new KeyAdapter() {
             @Override
             public void keyPressed(KeyEvent e) {
-                if(e.getKeyCode() == KeyEvent.VK_C){
+                if (e.getKeyCode() == KeyEvent.VK_C) {
                     clearScene();
-                }
-                else if (e.getKeyCode() == KeyEvent.VK_M) {
-                    if (drawMode == DrawMode.LINE){
+                } else if (e.getKeyCode() == KeyEvent.VK_M) {
+                    if (drawMode == DrawMode.LINE) {
                         drawMode = DrawMode.POLYGON;
-                    }
-                    else {
+                    } else {
                         drawMode = DrawMode.LINE;
                     }
-                }
-                else if (e.getKeyCode() == KeyEvent.VK_N) {
-                    if (toolMode == ToolMode.EDIT){
+                } else if (e.getKeyCode() == KeyEvent.VK_N) {
+                    if (toolMode == ToolMode.EDIT) {
                         toolMode = ToolMode.DELETE;
-                    }
-                    else {
+                    } else {
                         toolMode = ToolMode.EDIT;
                     }
                 }
@@ -127,10 +129,11 @@ public class Controller2D {
         });
     }
 
+    // celá scéna se kreslí znovu od nuly, aby nezůstávaly staré čáry
     private void drawScene() {
         panel.getRaster().clear();
 
-        if (!lines.isEmpty()){
+        if (!lines.isEmpty()) {
             for (Line line : lines) {
                 lineRasterizer.rasterize(line);
             }

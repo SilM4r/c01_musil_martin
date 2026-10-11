@@ -4,6 +4,7 @@ import model.Line;
 import model.Point2D;
 import raster.Raster;
 
+/** Společný předek algoritmů pro kreslení úsečky. */
 public abstract class LineRasterizer {
     protected Raster raster;
 
