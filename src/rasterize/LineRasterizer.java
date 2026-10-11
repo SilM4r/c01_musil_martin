@@ -11,10 +11,13 @@ public abstract class LineRasterizer {
         this.raster = raster;
     }
 
-    public void rasterize(int x1, int y1, int x2, int y2) {
+    public abstract void rasterize(int x1, int y1, int x2, int y2);
+
+    public void rasterize(Point2D a, Point2D b) {
+        rasterize(a.getX(), a.getY(), b.getX(), b.getY());
     }
-    public void rasterize(Point2D start, Point2D end) {
-    }
+
     public void rasterize(Line line) {
+        rasterize(line.getStart(), line.getEnd());
     }
 }

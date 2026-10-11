@@ -14,18 +14,6 @@ public class LineRasterizerTrivial extends LineRasterizer {
     }
 
     @Override
-    public void rasterize(Point2D pointA, Point2D pointB){
-        rasterize(pointA.getX(),pointA.getY(),pointB.getX(),pointB.getY());
-
-    }
-
-    @Override
-    public void rasterize(Line line){
-        rasterize(line.getStart().getX(),line.getStart().getY(),line.getEnd().getX(),line.getEnd().getY());
-
-    }
-
-    @Override
     public void rasterize(int x1, int y1, int x2, int y2) {
         if (x1 == x2) {
             if (y1 > y2) {
