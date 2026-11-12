@@ -36,6 +36,8 @@ public class Controller2D {
     private DrawMode drawMode = DrawMode.POLYGON;
     private ToolMode toolMode = ToolMode.EDIT;
 
+    private boolean shift = false;
+
     // vrchol chycený pravým tlačítkem, -1 = žádný
     private int draggedPointIndex = -1;
 
@@ -92,7 +94,40 @@ public class Controller2D {
                     if (drawMode == DrawMode.LINE) {
                         if (lines.isEmpty()) return;
                         Line last = lines.get(lines.size() - 1);
-                        lines.set(lines.size() - 1, new Line(last.getStart(), point));
+                        if (shift) {
+                            int i = Math.abs(Math.abs(point.getX() - last.getStart().getX()) - Math.abs(point.getY() - last.getStart().getY()));
+                            if ( i < 50)
+                            {
+                                int i2 = 0;
+                                if (point.getX() - last.getStart().getX() > point.getY() - last.getStart().getY())
+                                    i2 = Math.abs(point.getX() - last.getStart().getX());
+                                else
+                                    i2 = Math.abs(point.getY() - last.getStart().getY());
+
+
+                                int a = 1;
+                                int b = -1;
+
+                                if (point.getX() - last.getStart().getX() < 0)
+                                    a = -1;
+                                if (point.getY() - last.getStart().getY() > 0)
+                                    b = 1;
+
+
+
+                                lines.set(lines.size() - 1, new Line(last.getStart(), new Point2D(last.getStart().getX() + i2 * a,last.getStart().getY() + i2*b)));
+                            }
+                            else if ((Math.abs(point.getX() - last.getStart().getX()) > Math.abs(point.getY() - last.getStart().getY()))) {
+                                lines.set(lines.size() - 1, new Line(last.getStart(), new Point2D(point.getX(),last.getStart().getY())));
+                            } else {
+                                lines.set(lines.size() - 1, new Line(last.getStart(), new Point2D(last.getStart().getX(), point.getY())));
+                            }
+                        }
+                        else
+                        {
+                            lines.set(lines.size() - 1, new Line(last.getStart(), point));
+                        }
+
                     } else {
                         if (polygon.getSize() == 0) return;
                         // tažením se posouvá právě přidaný vrchol
@@ -124,6 +159,12 @@ public class Controller2D {
                     } else {
                         toolMode = ToolMode.EDIT;
                     }
+                } else if (e.getKeyCode() == KeyEvent.VK_SHIFT) {
+                    if (shift)
+                        shift = false;
+                    else
+                        shift = true;
+
                 }
             }
         });
