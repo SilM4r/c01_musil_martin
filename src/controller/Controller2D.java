@@ -95,27 +95,18 @@ public class Controller2D {
                         if (lines.isEmpty()) return;
                         Line last = lines.get(lines.size() - 1);
                         if (shift) {
-                            int i = Math.abs(Math.abs(point.getX() - last.getStart().getX()) - Math.abs(point.getY() - last.getStart().getY()));
+                            int realX = point.getX() - last.getStart().getX();
+                            int realY = point.getY() - last.getStart().getY();
+
+                            int absRealX = Math.abs(realX);
+                            int absRealY = Math.abs(realY);
+
+                            int i = Math.abs(absRealX - absRealY);
                             if ( i < 50)
                             {
-                                int i2 = 0;
-                                if (point.getX() - last.getStart().getX() > point.getY() - last.getStart().getY())
-                                    i2 = Math.abs(point.getX() - last.getStart().getX());
-                                else
-                                    i2 = Math.abs(point.getY() - last.getStart().getY());
+                                int i2 = Math.min(absRealX, absRealY);
 
-
-                                int a = 1;
-                                int b = -1;
-
-                                if (point.getX() - last.getStart().getX() < 0)
-                                    a = -1;
-                                if (point.getY() - last.getStart().getY() > 0)
-                                    b = 1;
-
-
-
-                                lines.set(lines.size() - 1, new Line(last.getStart(), new Point2D(last.getStart().getX() + i2 * a,last.getStart().getY() + i2*b)));
+                                lines.set(lines.size() - 1, new Line(last.getStart(), new Point2D(last.getStart().getX() + i2 * Integer.signum(realX),last.getStart().getY() + i2*Integer.signum(realY))));
                             }
                             else if ((Math.abs(point.getX() - last.getStart().getX()) > Math.abs(point.getY() - last.getStart().getY()))) {
                                 lines.set(lines.size() - 1, new Line(last.getStart(), new Point2D(point.getX(),last.getStart().getY())));
