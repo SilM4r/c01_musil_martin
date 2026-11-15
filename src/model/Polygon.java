@@ -6,9 +6,18 @@ import java.util.List;
 /** Uzavřený polygon zadaný seznamem vrcholů. */
 public class Polygon {
     private final List<Point2D> points;
+    private int color = Context.Color.COLOR;
 
     public Polygon() {
         points = new ArrayList<>();
+    }
+
+    public int getColor() {
+        return color;
+    }
+
+    public void setColor(int color) {
+        this.color = color;
     }
 
     public void addPoint(Point2D point) {

@@ -11,6 +11,7 @@ public class RasterBufferedImage implements Raster {
 
     public RasterBufferedImage(int width, int height) {
         image = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
+        clear();
     }
 
     @Override
@@ -24,6 +25,14 @@ public class RasterBufferedImage implements Raster {
     @Override
     public void setPixel(Point2D point, int color) {
         setPixel(point.getX(), point.getY(), color);
+    }
+
+    @Override
+    public int getPixelColor(int x, int y) {
+        if (x >= 0 && x < getWidth() && y >= 0 && y < getHeight()) {
+            return image.getRGB(x, y) & 0x00ffffff;
+        }
+        return -1;
     }
 
     @Override
@@ -42,6 +51,9 @@ public class RasterBufferedImage implements Raster {
 
     @Override
     public void clear() {
-        image.getGraphics().clearRect(0, 0, image.getWidth(), image.getHeight());
+        java.awt.Graphics g = image.getGraphics();
+        g.setColor(new java.awt.Color(Context.Color.BACKGROUND_COLOR));
+        g.fillRect(0, 0, image.getWidth(), image.getHeight());
+        g.dispose();
     }
 }

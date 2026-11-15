@@ -17,6 +17,9 @@ public class PolygonRasterizer {
     }
 
     public void rasterize(Polygon polygon) {
+        int previousColor = lineRasterizer.getColor();
+        lineRasterizer.setColor(polygon.getColor());
+
         if (polygon.getSize() == 1) {
             Point2D pointA = polygon.getPoint(0);
             lineRasterizer.rasterize(pointA, pointA);
@@ -32,5 +35,7 @@ public class PolygonRasterizer {
             Point2D pointB = polygon.getPoint((i + 1) % polygon.getSize());
             lineRasterizer.rasterize(pointA, pointB);
         }
+
+        lineRasterizer.setColor(previousColor);
     }
 }

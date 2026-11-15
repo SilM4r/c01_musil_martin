@@ -8,6 +8,8 @@ public interface Raster {
 
     void setPixel(Point2D point, int color);
 
+    int getPixelColor(int x, int y);
+
     int getWidth();
 
     int getHeight();

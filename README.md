@@ -37,7 +37,7 @@ src/
 ├── model/                       Point2D, Line, Polygon (vrcholy, hledání nejbližšího)
 ├── raster/                      rozhraní Raster a jeho implementace nad BufferedImage
 ├── rasterize/                   LineRasterizer (předek), LineRasterizerTrivial, PolygonRasterizer
-└── view/                        Window a Panel, který zobrazuje raster
+└── view/                        Window, Panel (zobrazuje raster) a ControlPanel (boční UI)
 ```
 
 ## Algoritmus úsečky

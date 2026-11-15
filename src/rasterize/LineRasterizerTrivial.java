@@ -6,8 +6,6 @@ import raster.Raster;
 /** Triviální algoritmus úsečky z rovnice přímky y = k·x + q. */
 public class LineRasterizerTrivial extends LineRasterizer {
 
-    private final int color = Color.COLOR;
-
     public LineRasterizerTrivial(Raster raster) {
         super(raster);
     }
