@@ -167,6 +167,11 @@ public class Controller2D {
         panel.addMouseMotionListener(new MouseAdapter() {
             @Override
             public void mouseDragged(MouseEvent e) {
+                // při vyplňování se nic nekreslí ani needituje (stejně jako v mousePressed)
+                if (toolMode == ToolMode.SEED_FILL || toolMode == ToolMode.SCAN_LINE) {
+                    return;
+                }
+
                 Point2D point = new Point2D(e.getX(), e.getY());
 
                 if (SwingUtilities.isLeftMouseButton(e)) {

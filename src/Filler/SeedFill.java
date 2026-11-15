@@ -66,8 +66,9 @@ public class SeedFill implements Filler {
         this.seed = seed;
     }
 
+    // bez alfa kanálu (JColorChooser ho přidává), jinak by se nerovnala getPixelColor a fill by se zacyklil
     @Override
     public void setColor(int color) {
-        this.color = color;
+        this.color = color & 0x00ffffff;
     }
 }
