@@ -1,6 +1,6 @@
 package model;
 
-/** Hrana n-úhelníku pro algoritmus Scan-Line. */
+/** Hrana polygonu pro Scan-Line. */
 public class Edge {
     private final Point2D p1;
     private final Point2D p2;
@@ -14,6 +14,7 @@ public class Edge {
         return p1.getY() == p2.getY();
     }
 
+    // otočí hranu tak, aby vedla shora dolů (y1 < y2)
     public Edge orientate() {
         if (p1.getY() > p2.getY()) {
             return new Edge(p2, p1);
@@ -29,6 +30,7 @@ public class Edge {
         return p2.getY();
     }
 
+    // spodní konec se nepočítá, jinak by se společný vrchol dvou hran započítal dvakrát
     public boolean hasIntersection(int y) {
         return y >= p1.getY() && y < p2.getY();
     }

@@ -6,7 +6,6 @@ import raster.RasterBufferedImage;
 import javax.swing.*;
 import java.awt.*;
 
-/** Panel okna, který zobrazuje obsah rastru. */
 public class Panel extends JPanel {
     private Raster raster;
 

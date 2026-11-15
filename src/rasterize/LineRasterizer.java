@@ -4,7 +4,6 @@ import model.Line;
 import model.Point2D;
 import raster.Raster;
 
-/** Společný předek algoritmů pro kreslení úsečky. */
 public abstract class LineRasterizer {
     protected Raster raster;
     protected int color = Context.Color.COLOR;
@@ -31,6 +30,7 @@ public abstract class LineRasterizer {
         rasterize(a.getX(), a.getY(), b.getX(), b.getY());
     }
 
+    // úsečka se kreslí vlastní barvou, barva rasterizéru se pak vrátí
     public void rasterize(Line line) {
         int previousColor = this.color;
         this.color = line.getColor();

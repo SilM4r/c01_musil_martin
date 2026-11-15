@@ -11,13 +11,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
 
-/**
- * Boční ovládací panel (UI) pro výběr režimu kreslení, barev (obrys a výplň),
- * nástroje pravého tlačítka a akcí.
- */
+/** Boční panel; změny posílá controlleru přes listenery, controller do něj zpětně promítá stav kláves. */
 public class ControlPanel extends JPanel {
 
     private final JRadioButton radioPolygon;
+    private final JRadioButton radioClippingPolygon;
     private final JRadioButton radioLine;
 
     private final JRadioButton radioEdit;
@@ -27,44 +25,54 @@ public class ControlPanel extends JPanel {
 
     private final JCheckBox checkShift;
     private final JButton btnClear;
+    private final JButton btnClipping;
+    private final JButton btnClipLines;
 
-    // Barvy
     private Color lineColor = new Color(Context.Color.COLOR);
     private Color fillColor = new Color(Context.Color.FILL_COLOR);
+    private Color clippingColor = new Color(Context.Color.CLIPPING_COLOR);
 
     private final JButton btnLineColor;
     private final JButton btnFillColor;
+    private final JButton btnClippingColor;
     private final ColorIcon lineIcon;
     private final ColorIcon fillIcon;
+    private final ColorIcon clippingIcon;
 
     private final List<Consumer<Color>> lineColorListeners = new ArrayList<>();
     private final List<Consumer<Color>> fillColorListeners = new ArrayList<>();
+    private final List<Consumer<Color>> clippingColorListeners = new ArrayList<>();
 
     public ControlPanel() {
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
         setBorder(new EmptyBorder(10, 10, 10, 10));
         setPreferredSize(new Dimension(220, 650));
 
-        // 1. Režim kreslení (levé tlačítko)
+        // režim kreslení
         JPanel drawPanel = new JPanel();
         drawPanel.setLayout(new BoxLayout(drawPanel, BoxLayout.Y_AXIS));
         drawPanel.setBorder(new TitledBorder("Režim kreslení [M]"));
         drawPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
 
         radioPolygon = new JRadioButton("Polygon", true);
+        radioClippingPolygon = new JRadioButton("Polygon - Ořezávač");
         radioLine = new JRadioButton("Úsečka");
         radioPolygon.setFocusable(false);
+        radioClippingPolygon.setFocusable(false);
         radioLine.setFocusable(false);
 
         ButtonGroup drawGroup = new ButtonGroup();
         drawGroup.add(radioPolygon);
+        drawGroup.add(radioClippingPolygon);
         drawGroup.add(radioLine);
 
         drawPanel.add(radioPolygon);
         drawPanel.add(Box.createVerticalStrut(4));
+        drawPanel.add(radioClippingPolygon);
+        drawPanel.add(Box.createVerticalStrut(4));
         drawPanel.add(radioLine);
 
-        // 2. Barvy (Color Picker pro obrys i výplň)
+        // barvy
         JPanel colorPanel = new JPanel();
         colorPanel.setLayout(new BoxLayout(colorPanel, BoxLayout.Y_AXIS));
         colorPanel.setBorder(new TitledBorder("Barvy (Color Picker)"));
@@ -102,11 +110,29 @@ public class ControlPanel extends JPanel {
             }
         });
 
+        clippingIcon = new ColorIcon(clippingColor, 18);
+        btnClippingColor = new JButton(" Ořezávač: " + formatHex(clippingColor), clippingIcon);
+        btnClippingColor.setToolTipText("Kliknutím vyberete barvu pro ořezávací polygon (clippingPolygon)");
+        btnClippingColor.setFocusable(false);
+        btnClippingColor.setHorizontalAlignment(SwingConstants.LEFT);
+        btnClippingColor.setMaximumSize(new Dimension(Integer.MAX_VALUE, btnClippingColor.getPreferredSize().height));
+        btnClippingColor.addActionListener(e -> {
+            Color chosen = JColorChooser.showDialog(this, "Vyberte barvu ořezávacího polygonu", clippingColor);
+            if (chosen != null) {
+                setClippingColor(chosen);
+                for (Consumer<Color> listener : clippingColorListeners) {
+                    listener.accept(chosen);
+                }
+            }
+        });
+
         colorPanel.add(btnLineColor);
         colorPanel.add(Box.createVerticalStrut(6));
         colorPanel.add(btnFillColor);
+        colorPanel.add(Box.createVerticalStrut(6));
+        colorPanel.add(btnClippingColor);
 
-        // 3. Nástroj pravého tlačítka / režim
+        // nástroje
         JPanel toolPanel = new JPanel();
         toolPanel.setLayout(new BoxLayout(toolPanel, BoxLayout.Y_AXIS));
         toolPanel.setBorder(new TitledBorder("Nástroje / Režim [N]"));
@@ -136,7 +162,7 @@ public class ControlPanel extends JPanel {
         toolPanel.add(Box.createVerticalStrut(4));
         toolPanel.add(radioScanLine);
 
-        // 4. Zarovnání (Shift mód)
+        // zarovnání
         JPanel modPanel = new JPanel();
         modPanel.setLayout(new BoxLayout(modPanel, BoxLayout.Y_AXIS));
         modPanel.setBorder(new TitledBorder("Zarovnání [Shift]"));
@@ -147,7 +173,7 @@ public class ControlPanel extends JPanel {
         checkShift.setFocusable(false);
         modPanel.add(checkShift);
 
-        // 5. Akce scény
+        // akce
         JPanel actionPanel = new JPanel();
         actionPanel.setLayout(new BoxLayout(actionPanel, BoxLayout.Y_AXIS));
         actionPanel.setBorder(new TitledBorder("Akce"));
@@ -159,29 +185,27 @@ public class ControlPanel extends JPanel {
         btnClear.setMaximumSize(new Dimension(Integer.MAX_VALUE, btnClear.getPreferredSize().height));
         actionPanel.add(btnClear);
 
-        // 6. Nápověda
-        JPanel helpPanel = new JPanel();
-        helpPanel.setLayout(new BoxLayout(helpPanel, BoxLayout.Y_AXIS));
-        helpPanel.setBorder(new TitledBorder("Nápověda myši"));
-        helpPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
+        btnClipping = new JButton("Ořez polygonu [V]");
+        btnClipping.setToolTipText("Sutherland-Hodgman ořezání polygonu ořezávacím polygonem");
+        btnClipping.setFocusable(false);
+        btnClipping.setAlignmentX(Component.LEFT_ALIGNMENT);
+        btnClipping.setMaximumSize(new Dimension(Integer.MAX_VALUE, btnClipping.getPreferredSize().height));
+        actionPanel.add(Box.createVerticalStrut(4));
+        actionPanel.add(btnClipping);
 
-        JLabel lblLmb = new JLabel("<html><b>Levé tl.:</b> Kreslení</html>");
-        JLabel lblRmb = new JLabel("<html><b>Pravé tl.:</b> Úprava/Mazání</html>");
-        JLabel lblKeys = new JLabel("<html><i>Klávesy C, M, N, Shift fungují stále.</i></html>");
+        btnClipLines = new JButton("Ořez úseček [B]");
+        btnClipLines.setToolTipText("Cohen-Sutherland ořezání úseček obdélníkovým oknem (clippingPolygon)");
+        btnClipLines.setFocusable(false);
+        btnClipLines.setAlignmentX(Component.LEFT_ALIGNMENT);
+        btnClipLines.setMaximumSize(new Dimension(Integer.MAX_VALUE, btnClipLines.getPreferredSize().height));
+        actionPanel.add(Box.createVerticalStrut(4));
+        actionPanel.add(btnClipLines);
 
-        helpPanel.add(lblLmb);
-        helpPanel.add(Box.createVerticalStrut(4));
-        helpPanel.add(lblRmb);
-        helpPanel.add(Box.createVerticalStrut(8));
-        helpPanel.add(lblKeys);
-
-        // Nastavení maximální šířky panelů, aby se vyplnila šířka sidebaru
+        // BoxLayout jinak panely neroztáhne na šířku sidebaru
         drawPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, drawPanel.getPreferredSize().height));
         colorPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, colorPanel.getPreferredSize().height));
         toolPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, toolPanel.getPreferredSize().height));
         modPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, modPanel.getPreferredSize().height));
-        actionPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, actionPanel.getPreferredSize().height));
-        helpPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, helpPanel.getPreferredSize().height));
 
         add(drawPanel);
         add(Box.createVerticalStrut(8));
@@ -193,16 +217,11 @@ public class ControlPanel extends JPanel {
         add(Box.createVerticalStrut(8));
         add(actionPanel);
         add(Box.createVerticalStrut(8));
-        add(helpPanel);
         add(Box.createVerticalGlue());
     }
 
     private String formatHex(Color c) {
         return String.format("#%06X", (0xFFFFFF & c.getRGB()));
-    }
-
-    public Color getLineColor() {
-        return lineColor;
     }
 
     public void setLineColor(Color color) {
@@ -213,16 +232,20 @@ public class ControlPanel extends JPanel {
         btnLineColor.repaint();
     }
 
-    public Color getFillColor() {
-        return fillColor;
-    }
-
     public void setFillColor(Color color) {
         this.fillColor = color;
         Context.Color.FILL_COLOR = color.getRGB();
         fillIcon.setColor(color);
         btnFillColor.setText(" Výplň: " + formatHex(color));
         btnFillColor.repaint();
+    }
+
+    public void setClippingColor(Color color) {
+        this.clippingColor = color;
+        Context.Color.CLIPPING_COLOR = color.getRGB();
+        clippingIcon.setColor(color);
+        btnClippingColor.setText(" Ořezávač: " + formatHex(color));
+        btnClippingColor.repaint();
     }
 
     public void addLineColorListener(Consumer<Color> listener) {
@@ -233,11 +256,17 @@ public class ControlPanel extends JPanel {
         fillColorListeners.add(listener);
     }
 
+    public void addClippingColorListener(Consumer<Color> listener) {
+        clippingColorListeners.add(listener);
+    }
+
     public void setDrawMode(DrawMode mode) {
         if (mode == DrawMode.LINE) {
             radioLine.setSelected(true);
-        } else {
+        } else if (mode == DrawMode.POLYGON) {
             radioPolygon.setSelected(true);
+        } else {
+            radioClippingPolygon.setSelected(true);
         }
     }
 
@@ -257,12 +286,9 @@ public class ControlPanel extends JPanel {
         checkShift.setSelected(shift);
     }
 
-    public boolean isShiftSelected() {
-        return checkShift.isSelected();
-    }
-
     public void addDrawModeListener(Consumer<DrawMode> listener) {
         radioPolygon.addActionListener(e -> listener.accept(DrawMode.POLYGON));
+        radioClippingPolygon.addActionListener(e -> listener.accept(DrawMode.CLIPPING_POLYGON));
         radioLine.addActionListener(e -> listener.accept(DrawMode.LINE));
     }
 
@@ -281,9 +307,15 @@ public class ControlPanel extends JPanel {
         btnClear.addActionListener(e -> listener.run());
     }
 
-    /**
-     * Vlastní ikona pro zobrazení vzorku barvy na tlačítku.
-     */
+    public void addClippingListener(Runnable listener) {
+        btnClipping.addActionListener(e -> listener.run());
+    }
+
+    public void addClipLinesListener(Runnable listener) {
+        btnClipLines.addActionListener(e -> listener.run());
+    }
+
+    // čtvereček s vybranou barvou na tlačítku
     private static class ColorIcon implements Icon {
         private Color color;
         private final int size;

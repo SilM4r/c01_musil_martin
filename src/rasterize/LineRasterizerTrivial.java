@@ -1,6 +1,5 @@
 package rasterize;
 
-import Context.Color;
 import raster.Raster;
 
 /** Triviální algoritmus úsečky z rovnice přímky y = k·x + q. */
@@ -23,12 +22,10 @@ public class LineRasterizerTrivial extends LineRasterizer {
             return;
         }
 
-        // y = k * x + q
         double k = (double) (y2 - y1) / (x2 - x1);
         double q = y1 - k * x1;
 
         if (Math.abs(k) <= 1) {
-            // řídicí osa x
             if (x1 > x2) {
                 int t = x1; x1 = x2; x2 = t;
             }
@@ -37,7 +34,7 @@ public class LineRasterizerTrivial extends LineRasterizer {
                 raster.setPixel(x, y, color);
             }
         } else {
-            // strmá úsečka, řídicí osa y
+            // strmá úsečka se prochází po y, jinak by v ní vznikly mezery
             if (y1 > y2) {
                 int t = y1; y1 = y2; y2 = t;
             }

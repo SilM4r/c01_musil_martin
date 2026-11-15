@@ -1,6 +1,6 @@
 package Context;
 
-/** Co dělá pravé tlačítko / nástroj: přesun, mazání, nebo vyplňování. */
+/** EDIT a DELETE pracují s pravým tlačítkem, výplně reagují na kliknutí kterýmkoli tlačítkem. */
 public enum ToolMode {
     EDIT,
     DELETE,

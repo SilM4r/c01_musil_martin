@@ -1,10 +1,7 @@
 package raster;
 
-import model.Point2D;
-
 import java.awt.image.BufferedImage;
 
-/** Raster nad BufferedImage, který Panel vykresluje na obrazovku. */
 public class RasterBufferedImage implements Raster {
 
     private final BufferedImage image;
@@ -23,13 +20,9 @@ public class RasterBufferedImage implements Raster {
     }
 
     @Override
-    public void setPixel(Point2D point, int color) {
-        setPixel(point.getX(), point.getY(), color);
-    }
-
-    @Override
     public int getPixelColor(int x, int y) {
         if (x >= 0 && x < getWidth() && y >= 0 && y < getHeight()) {
+            // getRGB vrací i alfa kanál, bez něj jde barva porovnat s 0xRRGGBB
             return image.getRGB(x, y) & 0x00ffffff;
         }
         return -1;

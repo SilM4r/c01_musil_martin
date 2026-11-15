@@ -8,16 +8,14 @@ import java.util.ArrayDeque;
 import java.util.Deque;
 
 /**
- * Semínkový algoritmus (Seed-Fill / 4-směrové záplavové vyplňování).
- * Používá explicitní zásobník (ArrayDeque) místo rekurze,
- * aby nedocházelo k chybě java.lang.StackOverflowError při větších plochách.
+ * 4-směrové záplavové vyplňování. Vlastní zásobník místo rekurze,
+ * aby velká plocha neshodila StackOverflowError.
  */
 public class SeedFill implements Filler {
 
+    private final Raster raster;
     private Point2D seed;
-    private Raster raster;
     private int color = Color.FILL_COLOR;
-    private int backgroundColor = Color.BACKGROUND_COLOR;
 
     public SeedFill(Raster raster) {
         this.raster = raster;
@@ -25,32 +23,20 @@ public class SeedFill implements Filler {
 
     @Override
     public void fill() {
-        if (seed == null || raster == null) {
+        if (seed == null) {
             return;
         }
 
-        color = Color.FILL_COLOR;
-        backgroundColor = raster.getPixelColor(seed.getX(), seed.getY());
+        // vyplňuje se souvislá oblast barvy, na kterou se kliklo
+        int backgroundColor = raster.getPixelColor(seed.getX(), seed.getY());
         if (backgroundColor == -1 || backgroundColor == color) {
             return;
         }
 
-        fill(seed);
-    }
-
-    public void fill(Point2D point) {
-        if (point == null || raster == null) {
-            return;
-        }
-
-        backgroundColor = raster.getPixelColor(point.getX(), point.getY());
-        if (backgroundColor == -1 || backgroundColor == color) {
-            return;
-        }
-
+        // pixel se obarví hned při vložení, aby se na zásobník nedostal dvakrát
         Deque<Point2D> stack = new ArrayDeque<>();
-        raster.setPixel(point.getX(), point.getY(), color);
-        stack.push(point);
+        raster.setPixel(seed.getX(), seed.getY(), color);
+        stack.push(seed);
 
         while (!stack.isEmpty()) {
             Point2D p = stack.pop();
@@ -80,20 +66,8 @@ public class SeedFill implements Filler {
         this.seed = seed;
     }
 
-    public Point2D getSeed() {
-        return seed;
-    }
-
     @Override
     public void setColor(int color) {
         this.color = color;
-    }
-
-    public int getColor() {
-        return color;
-    }
-
-    public void setRaster(Raster raster) {
-        this.raster = raster;
     }
 }

@@ -1,7 +1,8 @@
 package Context;
 
-/** Co kreslí levé tlačítko: úsečky, nebo vrcholy polygonu. */
+/** Co kreslí levé tlačítko. */
 public enum DrawMode {
     LINE,
-    POLYGON
+    POLYGON,
+    CLIPPING_POLYGON
 }

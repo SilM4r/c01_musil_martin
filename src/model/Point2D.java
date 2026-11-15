@@ -1,6 +1,5 @@
 package model;
 
-/** Bod v rastru, souřadnice v pixelech. */
 public class Point2D {
     private final int x, y;
 
